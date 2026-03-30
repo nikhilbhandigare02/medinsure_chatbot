@@ -115,7 +115,7 @@ class BookingFlowController {
     if (input === 'out_of_scope') {
       return {
         success: true,
-        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\nJust say \"home visit\" or \"diagnostic center\".",
+        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\n.",
         options: ['Home Visit', 'Diagnostic Center Visit'],
         type: 'selection',
         channelType: session.channelType,
@@ -127,7 +127,7 @@ class BookingFlowController {
     if (input === 'incomplete') {
       return {
         success: true,
-        message: "I'm sorry, I didn't catch the complete request. Could you please tell me your preference?\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\nJust say \"home visit\" or \"diagnostic center\".",
+        message: "I'm sorry, I didn't catch the complete request. Could you please tell me your preference?\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\n.",
         options: ['Home Visit', 'Diagnostic Center Visit'],
         type: 'selection',
         channelType: session.channelType,
@@ -174,7 +174,7 @@ class BookingFlowController {
     if (input === 'out_of_scope') {
       return {
         success: true,
-        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nWe have 3 centers available:\n\n1. HealthCare - 2 km away\n2. City Lab - 5 km away\n3. MedPlus - 8 km away\n\nWhich center would you prefer? Just say the center name like \"HealthCare\", \"City Lab\", or \"MedPlus\".",
+        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nWe have 3 centers available:\n\n1. HealthCare - 2 km away\n2. City Lab - 5 km away\n3. MedPlus - 8 km away\n\nWhich center would you prefer?",
         options: ['HealthCare', 'City Lab', 'MedPlus'],
         type: 'selection',
         channelType: session.channelType,
@@ -186,7 +186,7 @@ class BookingFlowController {
     if (input === 'incomplete') {
       return {
         success: true,
-        message: "I'm sorry, I didn't catch the complete center name. Could you please tell me which center you prefer?\n\nWe have 3 centers available:\n\n1. HealthCare - 2 km away\n2. City Lab - 5 km away\n3. MedPlus - 8 km away\n\nJust say the center name like \"HealthCare\", \"City Lab\", or \"MedPlus\".",
+        message: "I'm sorry, I didn't catch the complete center name. Could you please tell me which center you prefer?\n\nWe have 3 centers available:\n\n1. HealthCare - 2 km away\n2. City Lab - 5 km away\n3. MedPlus - 8 km away\n\n",
         options: ['HealthCare', 'City Lab', 'MedPlus'],
         type: 'selection',
         channelType: session.channelType,
@@ -471,7 +471,7 @@ class BookingFlowController {
     const channelType = session.channelType;
     const userName = session.userName || 'valued customer';
 
-    let message = `Hi ${userName}, welcome to MedInsure!\n\nCongratulations on your new insurance policy. Now we need to schedule your mandatory medical check-up.\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\nJust say "home visit" or "diagnostic center".`;
+    let message = `Hi ${userName}, welcome to MedInsure!\n\nCongratulations on your new insurance policy. Now we need to schedule your mandatory medical check-up.\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\n.`;
 
     const options = ['Home Visit', 'Diagnostic Center Visit'];
 
@@ -509,7 +509,7 @@ class BookingFlowController {
     DIAGNOSTIC_CENTERS.forEach((center, index) => {
       message += `${index + 1}. ${center.name} - ${center.distance} away\n`;
     });
-    message += `\nWhich center would you prefer? Just say the center name like \"HealthCare\", \"City Lab\", or \"MedPlus\".`;
+    message += `\nWhich center would you prefer?.`;
 
     const options = ['HealthCare', 'City Lab', 'MedPlus'];
 
@@ -540,7 +540,7 @@ class BookingFlowController {
   }
 
   /**
-   * Diagnostic center time selection
+   * Diagnostic center time selection  
    */
   getDiagnosticCenterTimeSelection(session, center) {
     const centerName = center.name;
@@ -548,7 +548,7 @@ class BookingFlowController {
 
     return {
       success: true,
-      message,
+      message, 
       options: ['7 AM', '8 AM', '9 AM'],
       type: 'selection',
       channelType: session.channelType,
