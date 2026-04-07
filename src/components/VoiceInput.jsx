@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSpeech } from '../hooks/useSpeech';
+import { usePiper } from '../hooks/usePiper';
 
 export const VoiceInput = ({ onTranscriptComplete, onSpeakResponse, disabled }) => {
   const {
@@ -14,7 +14,7 @@ export const VoiceInput = ({ onTranscriptComplete, onSpeakResponse, disabled }) 
     stopSpeaking,
     resetTranscript,
     fullTranscript
-  } = useSpeech();
+  } = usePiper();
 
   const handleToggleListening = () => {
     if (isListening) {

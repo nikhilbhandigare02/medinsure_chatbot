@@ -7,6 +7,7 @@ import voiceRouter from './routes/voice.js';
 import gatherRouter from './routes/gather.js';
 import callRouter, { initializeTwilio } from './routes/call.js';
 import bookingRouter from './routes/booking.js';
+import ttsRouter from './routes/tts.js';
 
 // Load environment variables
 const envResult = dotenv.config();
@@ -55,6 +56,7 @@ app.use('/voice', voiceRouter);
 app.use('/voice/gather', gatherRouter);
 app.use('/call', callRouter);
 app.use('/api/booking', bookingRouter);
+app.use('/api/tts', ttsRouter);
 
 // 404 handler
 app.use((req, res) => {

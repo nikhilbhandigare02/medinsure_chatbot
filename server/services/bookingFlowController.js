@@ -6,6 +6,13 @@
 
 import sessionManager from './bookingSessionManager.js';
 import { extractIntent } from './dynamicIntentExtractor.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 import {
   DEMO_USERS,
   FLOW_TYPES,
@@ -42,6 +49,15 @@ class BookingFlowController {
     // Get entry message
     const response = this.getEntryMessage(session);
 
+    // Add entry message to transcript
+    if (response && response.message) {
+      session.transcript.push({
+        role: 'assistant',
+        content: response.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     return {
       success: true,
       sessionId,
@@ -64,6 +80,13 @@ class BookingFlowController {
         error: 'Invalid session ID'
       };
     }
+
+    // Add user message to transcript
+    session.transcript.push({
+      role: 'user',
+      content: userInput,
+      timestamp: new Date().toISOString()
+    });
 
     const currentStep = session.currentStep;
 
@@ -101,6 +124,15 @@ class BookingFlowController {
         };
     }
 
+    // Add assistant response to transcript
+    if (response && response.message) {
+      session.transcript.push({
+        role: 'assistant',
+        content: response.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     return response;
   }
 
@@ -115,7 +147,7 @@ class BookingFlowController {
     if (input === 'out_of_scope') {
       return {
         success: true,
-        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\n.",
+        message: "I can help you schedule your mandatory medical check‑up. Would you like a doctor to visit your home, or would you prefer to go to a diagnostic center?",
         options: ['Home Visit', 'Diagnostic Center Visit'],
         type: 'selection',
         channelType: session.channelType,
@@ -155,7 +187,7 @@ class BookingFlowController {
       // Invalid input - ask again with acknowledgment
       return {
         success: true,
-        message: `Sorry, I didn't catch that. Please say "home visit" or "diagnostic center".`,
+        message: `Sorry, I didn't catch that. Would you like a home visit, or would you prefer a diagnostic center?`,
         options: ['Home Visit', 'Diagnostic Center Visit'],
         type: 'selection',
         channelType: session.channelType,
@@ -174,7 +206,7 @@ class BookingFlowController {
     if (input === 'out_of_scope') {
       return {
         success: true,
-        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nWe have 3 centers available:\n\n1. HealthCare - 2 km away\n2. City Lab - 5 km away\n3. MedPlus - 8 km away\n\nWhich center would you prefer?",
+        message: "I can help you book your medical check‑up. Nearby options include HealthCare (about 2 km), City Lab (around 5 km), and MedPlus (about 8 km). Which would you like to choose?",
         options: ['HealthCare', 'City Lab', 'MedPlus'],
         type: 'selection',
         channelType: session.channelType,
@@ -186,7 +218,7 @@ class BookingFlowController {
     if (input === 'incomplete') {
       return {
         success: true,
-        message: "I'm sorry, I didn't catch the complete center name. Could you please tell me which center you prefer?\n\nWe have 3 centers available:\n\n1. HealthCare - 2 km away\n2. City Lab - 5 km away\n3. MedPlus - 8 km away\n\n",
+        message: "I didn't catch the center name. You can choose HealthCare, City Lab, or MedPlus — which works for you?",
         options: ['HealthCare', 'City Lab', 'MedPlus'],
         type: 'selection',
         channelType: session.channelType,
@@ -198,7 +230,7 @@ class BookingFlowController {
       // Invalid center number - help user
       return {
         success: true,
-        message: `Sorry, I didn't catch that. Please say "HealthCare", "City Lab", or "MedPlus" for the center you prefer.`,
+        message: `Sorry, I didn't catch that. Which center would you like — HealthCare, City Lab, or MedPlus?`,
         options: ['HealthCare', 'City Lab', 'MedPlus'],
         type: 'selection',
         channelType: session.channelType,
@@ -238,7 +270,7 @@ class BookingFlowController {
       const center = getCenterById(session.selectedCenter);
       return {
         success: true,
-        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nI see you've selected " + center.name + ". Just a heads up - it's about " + center.distance + " from your location. Is that okay with you, or would you like to choose a closer center?\n\nJust say \"yes\" to continue or \"no\" to choose another center.",
+        message: "You've chosen " + center.name + ". It's about " + center.distance + " from you. Does that work, or would you prefer a closer center? You can just say yes or no.",
         options: ['Yes', 'No'],
         type: 'selection',
         channelType: session.channelType,
@@ -251,7 +283,7 @@ class BookingFlowController {
       const center = getCenterById(session.selectedCenter);
       return {
         success: true,
-        message: "I'm sorry, I didn't catch your complete response. Could you please confirm if the distance is okay?\n\nI see you've selected " + center.name + ". It's about " + center.distance + " from your location. Is that okay with you, or would you like to choose a closer center?\n\nJust say \"yes\" to continue or \"no\" to choose another center.",
+        message: "I didn't catch that. " + center.name + " is about " + center.distance + " from you. Is that okay? Please say yes or no.",
         options: ['Yes', 'No'],
         type: 'selection',
         channelType: session.channelType,
@@ -302,7 +334,7 @@ class BookingFlowController {
     if (input === 'out_of_scope') {
       return {
         success: true,
-        message: "I'm sorry, I can only help you with booking your medical appointment. I'm here to assist you with scheduling your mandatory medical check-up through MedInsure.\n\nNow, what time works best for you? We have these slots available:\n\nJust say \"7 AM\", \"8 AM\", or \"9 AM\".",
+        message: "I can help you with your booking. What time in the morning works best for you? For example, you can say seven am, eight am, or nine am.",
         options: ['7 AM', '8 AM', '9 AM'],
         type: 'selection',
         channelType: session.channelType,
@@ -314,7 +346,7 @@ class BookingFlowController {
     if (input === 'incomplete') {
       return {
         success: true,
-        message: "I'm sorry, I didn't catch the complete time. Could you please tell me what time you prefer?\n\nWe have these slots available:\n\nJust say \"7 AM\", \"8 AM\", or \"9 AM\".",
+        message: "I didn't catch the time. Could you tell me a time in the morning that suits you — for example, seven am, eight am, or nine am?",
         options: ['7 AM', '8 AM', '9 AM'],
         type: 'selection',
         channelType: session.channelType,
@@ -326,7 +358,7 @@ class BookingFlowController {
     if (input === 'invalid') {
       return {
         success: true,
-        message: `I'm sorry, but that time is not available. Please choose from our available slots: "7 AM", "8 AM", or "9 AM".`,
+        message: `That time isn’t available. Please share a time between seven and nine in the morning — for example, seven am, eight am, or nine am.`,
         options: ['7 AM', '8 AM', '9 AM'],
         type: 'selection',
         channelType: session.channelType,
@@ -433,7 +465,7 @@ class BookingFlowController {
       // Invalid input
       return {
         success: true,
-        message: `I didn't quite catch that. Please say "7 AM", "8 AM", or "9 AM" for your preferred time.`,
+        message: `I didn’t quite catch that. Please tell me a morning time that works for you — seven am, eight am, or nine am are available.`,
         options: ['7 AM', '8 AM', '9 AM'],
         type: 'selection',
         channelType: session.channelType,
@@ -471,7 +503,7 @@ class BookingFlowController {
     const channelType = session.channelType;
     const userName = session.userName || 'valued customer';
 
-    let message = `Hi ${userName}, welcome to MedInsure!\n\nCongratulations on your new insurance policy. Now we need to schedule your mandatory medical check-up.\n\nWould you prefer a doctor to visit you at home, or would you like to visit one of our diagnostic centers?\n\n.`;
+    let message = `Hi ${userName}, welcome to MedInsure. We need to schedule your mandatory medical check‑up. Would you like a doctor to visit your home, or would you prefer to go to a diagnostic center?`;
 
     const options = ['Home Visit', 'Diagnostic Center Visit'];
 
@@ -489,7 +521,7 @@ class BookingFlowController {
    * Home visit time selection
    */
   getHomeVisitTimeSelection(session) {
-    const message = `I've noted that you prefer a home visit. One of our medical professionals will visit you at your home.\n\nNow, what time works best for you? We have these slots available:\n\nJust say "7 AM", "8 AM", or "9 AM".`;
+    const message = `Great — a home visit it is. What time in the morning works best for you? You can say something like seven am, eight am, or nine am.`;
 
     return {
       success: true,
@@ -505,11 +537,10 @@ class BookingFlowController {
    * Diagnostic center selection
    */
   getCenterSelection(session) {
-    let message = `Let me find the best diagnostic center near you.\n\nWe have 3 centers available:\n`;
-    DIAGNOSTIC_CENTERS.forEach((center, index) => {
-      message += `${index + 1}. ${center.name} - ${center.distance} away\n`;
-    });
-    message += `\nWhich center would you prefer?.`;
+    let message = `Here are a few nearby options: `;
+    message += `${DIAGNOSTIC_CENTERS[0].name} (${DIAGNOSTIC_CENTERS[0].distance}), `;
+    message += `${DIAGNOSTIC_CENTERS[1].name} (${DIAGNOSTIC_CENTERS[1].distance}), `;
+    message += `and ${DIAGNOSTIC_CENTERS[2].name} (${DIAGNOSTIC_CENTERS[2].distance}). Which would you like to go with?`;
 
     const options = ['HealthCare', 'City Lab', 'MedPlus'];
 
@@ -527,7 +558,7 @@ class BookingFlowController {
    * Distance confirmation for far centers
    */
   getDistanceConfirmation(session, center) {
-    const message = `I see you've selected ${center.name}. Just a heads up - it's about ${center.distance} from your location. Is that okay with you, or would you like to choose a closer center?\n\nJust say \"yes\" to continue or \"no\" to choose another center.`;
+    const message = `You’ve selected ${center.name}. It’s about ${center.distance} from you. Does that work, or would you prefer something closer? You can say yes or no.`;
 
     return {
       success: true,
@@ -544,7 +575,7 @@ class BookingFlowController {
    */
   getDiagnosticCenterTimeSelection(session, center) {
     const centerName = center.name;
-    const message = `I've confirmed your appointment at ${centerName}.\n\nNow let's pick a time that works for you. We have these slots available:\n\nJust say "7 AM", "8 AM", or "9 AM".`;
+    const message = `Great — we’ll book it at ${centerName}. What time in the morning would you like? For example, seven am, eight am, or nine am.`;
 
     return {
       success: true,
@@ -562,22 +593,19 @@ class BookingFlowController {
   getUnavailableSlotMessage(session, selectedTime) {
     console.log(`[DEBUG] getUnavailableSlotMessage called with selectedTime: ${selectedTime}`);
     const availableSlots = getAvailableSlots(TIME_SLOTS, session.selectedFlow);
-    let message = `I'm sorry, but ${selectedTime} is not available right now.`;
+    let message = `That time isn’t available right now.`;
     console.log(`[DEBUG] Generated message: ${message}`);
 
     if (session.selectedFlow === FLOW_TYPES.HOME) {
-      message += ` For home visits, we have these times available:\n`;
+      message += ` For home visits, available times are `;
     } else {
       const center = getCenterById(session.selectedCenter);
-      message += ` At ${center.name}, we have these times available:\n`;
+      message += ` At ${center.name}, available times are `;
     }
 
-    availableSlots.forEach((slot, index) => {
-      const slotIndex = TIME_SLOTS.indexOf(slot) + 1;
-      message += `${slotIndex}. ${slot}\n`;
-    });
+    message += `${availableSlots.join(', ')}.`;
 
-    message += `\nWhich of these times works better for you?`;
+    message += ` Which of these works for you?`;
 
     const slotOptions = availableSlots.map(
       slot => `${TIME_SLOTS.indexOf(slot) + 1} - ${slot}`
@@ -614,8 +642,8 @@ class BookingFlowController {
     if (currentStep === STEPS.TIME_SELECTION) {
       return {
         success: true,
-        message: `I didn't catch that. Please say 1 for 8 AM, 2 for 9 AM, or 3 for 10 AM.`,
-        options: ['1 - 8:00 AM', '2 - 9:00 AM', '3 - 10:00 AM'],
+        message: `I didn’t catch that. Please share a morning time that suits you — for example, seven am, eight am, or nine am.`,
+        options: ['7 AM', '8 AM', '9 AM'],
         type: 'selection',
         channelType: session.channelType,
         currentStep: STEPS.TIME_SELECTION
@@ -661,6 +689,9 @@ class BookingFlowController {
       currentStep: STEPS.COMPLETED
     });
 
+    // Save the transcript to a file
+    this.saveTranscript(session);
+
     return {
       success: true,
       message,
@@ -675,6 +706,40 @@ class BookingFlowController {
         user: session.userName
       }
     };
+  }
+
+  /**
+   * Save conversation transcript to a file
+   */
+  saveTranscript(session) {
+    try {
+      const transcriptsDir = path.join(__dirname, '..', 'transcripts');
+      if (!fs.existsSync(transcriptsDir)) {
+        fs.mkdirSync(transcriptsDir, { recursive: true });
+      }
+
+      const filename = `transcript_${session.userId}_${session.sessionId}_${Date.now()}.json`;
+      const filePath = path.join(transcriptsDir, filename);
+
+      const transcriptData = {
+        sessionId: session.sessionId,
+        userId: session.userId,
+        userName: session.userName,
+        channelType: session.channelType,
+        completedAt: new Date().toISOString(),
+        bookingDetails: {
+          flow: session.selectedFlow,
+          center: session.selectedCenter,
+          time: session.selectedTime
+        },
+        transcript: session.transcript
+      };
+
+      fs.writeFileSync(filePath, JSON.stringify(transcriptData, null, 2));
+      console.log(`[Transcript] Saved to ${filePath}`);
+    } catch (error) {
+      console.error('[Transcript Error] Failed to save transcript:', error.message);
+    }
   }
 
   /**

@@ -10,6 +10,7 @@ import { AppointmentBookingChat } from './components/AppointmentBookingChat';
 import { AppointmentBookingVoice } from './components/AppointmentBookingVoice';
 import { AppointmentBookingCall } from './components/AppointmentBookingCall';
 import { sendMessage } from './services/groqService';
+import patientsData from './data/patients.json';
 import './App.css';
 
 function App() {
@@ -156,7 +157,7 @@ function App() {
           ) : mode === 'appointment-call' ? (
             <AppointmentBookingCall selectedPatient={selectedPatient} onSpeakResponse={handleSpeakResponse} />
           ) : mode === 'call' ? (
-            <CallMode selectedPatient={selectedPatient} />
+            <CallMode selectedPatient={selectedPatient} allPatients={patientsData.patients} />
           ) : (
             <>
               <ChatWindow messages={messages} isTyping={isTyping} />

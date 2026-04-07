@@ -20,6 +20,7 @@ class BookingSessionManager {
       selectedFlow: null, // 'home' | 'center'
       selectedCenter: null,
       selectedTime: null,
+      transcript: [], // Store the conversation transcript
       createdAt: Date.now(),
       lastActive: Date.now()
     };

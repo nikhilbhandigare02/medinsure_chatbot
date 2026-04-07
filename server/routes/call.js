@@ -68,7 +68,8 @@ router.post('/initiate', async (req, res) => {
     const call = await twilioClient.calls.create({
       url: `${process.env.SERVER_URL || 'http://localhost:3001'}/voice?patientName=${encodeURIComponent(patient?.name || '')}&policyId=${encodeURIComponent(patient?.policyId || '')}`,
       to: to,
-      from: process.env.TWILIO_PHONE_NUMBER
+      from: process.env.TWILIO_PHONE_NUMBER,
+      record: true
     });
 
     res.json({

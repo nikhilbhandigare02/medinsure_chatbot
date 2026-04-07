@@ -169,6 +169,31 @@ const executeFunction = (functionName, args, context) => {
   return { success: false, error: 'Function not found' };
 };
 
+// Helper function to save call transcript
+const saveCallTranscript = (callSid, session) => {
+  try {
+    const transcriptsDir = path.join(__dirname, '..', 'transcripts');
+    if (!fs.existsSync(transcriptsDir)) {
+      fs.mkdirSync(transcriptsDir, { recursive: true });
+    }
+
+    const filename = `voice_chat_${callSid}.json`;
+    const filePath = path.join(transcriptsDir, filename);
+
+    const transcriptData = {
+      callSid,
+      patientContext: session.context,
+      lastUpdated: new Date().toISOString(),
+      messages: session.messages
+    };
+
+    fs.writeFileSync(filePath, JSON.stringify(transcriptData, null, 2));
+    // console.log(`[Voice Chat Transcript] Saved to ${filePath}`);
+  } catch (error) {
+    console.error('[Voice Chat Transcript Error] Failed to save transcript:', error.message);
+  }
+};
+
 // Main chat function for voice calls (optimized for speech)
 export const handleVoiceChat = async (userInput, callSid, patientContext = {}) => {
   try {
@@ -251,6 +276,9 @@ Help with appointments, claims, payments, and questions.`
       role: 'assistant',
       content: assistantMessage.content
     });
+
+    // Save transcript after each turn
+    saveCallTranscript(callSid, session);
 
     return {
       message: assistantMessage.content,

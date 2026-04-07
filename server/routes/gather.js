@@ -177,7 +177,7 @@ router.post('/', async (req, res) => {
           voice: 'Google.en-IN-Standard-A',
           language: 'en-IN'
         },
-        'Please select an option.'
+
       );
     }
 
@@ -194,7 +194,7 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error('Error processing speech:', error);
 
-    twiml.say(
+    twiml.say(   
       {
         voice: 'Google.en-IN-Standard-A',
         language: 'en-IN'

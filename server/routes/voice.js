@@ -46,7 +46,7 @@ router.post('/', (req, res) => {
       voice: 'Google.en-IN-Standard-A',
       language: 'en-IN'
     },
-    'Please tell me what you need. select Option Home Visit appointment or Diagnostic Center appointment.'
+    'How can I help you today? Would you like a home visit, or would you prefer to visit a diagnostic center?'
   );
 
   // If no input, repeat
